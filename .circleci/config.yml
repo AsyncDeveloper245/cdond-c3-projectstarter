@@ -123,8 +123,8 @@ jobs:
           command: |
             cd frontend
             npm install
-            npm audit fix --audit-level=critical
-
+            npm audit fix --audit-level=critical --force
+            npm audit --audit-level=critical
   scan-backend:
     docker:
       - image: circleci/node:13.8.0
@@ -136,8 +136,9 @@ jobs:
           name: Scan Backend Code
           command: |
             cd backend
-            npm install
-            npm audit fix --audit-level=critical
+            npm audit fix
+            npm audit fix --audit-level=critical --force
+            npm audit --audit-level=critical
   deploy-infrastructure:
     docker:
       - image: amazon/aws-cli
@@ -190,7 +191,7 @@ jobs:
       - run:
           name: Configure Infrastructure
           command: |
-            ansible-playbook --ssh-common-args='-o StrictHostKeyChecking=no' -i .circleci/ansible/inventory.txt .circleci/ansible/configure-server.yml
+            ansible-playbook --ssh-common-args='-o StrictHostKeyChecking=no' -i .circleci/ansible/inventory.txt .circleci/ansible/configure-server.yml -vvv
           environment:
             ANSIBLE_HOST_KEY_CHECKING: False
       - destroy-environment
@@ -217,11 +218,22 @@ jobs:
 
   deploy-frontend:
     docker:
-      - image: alpine:latest
+      - image: circleci/node:16.13.1-bullseye
     steps:
       - checkout
-      - run: apk add --update npm
-      - run: apk add --update aws-cli
+      - run:
+          name: Install aws cli
+          command: |
+            curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+            unzip awscliv2.zip
+            sudo ./aws/install
+            aws --version
+      - run:
+          name: Install Ansible
+          command: |
+            sudo apt-get update
+            sudo apt-get install python3-pip git libffi-dev libssl-dev -y
+            pip3 install ansible==2.9.27
       - run:
           name: Get Backend URL
           command: |
@@ -275,7 +287,7 @@ jobs:
             cd .circleci/ansible
             echo "Contents  of the inventory.txt file is -------"
             cat inventory.txt
-            ansible-playbook --ssh-common-args='-o StrictHostKeyChecking=no' -i inventory.txt deploy-backend.yml
+            ansible-playbook --ssh-common-args='-o StrictHostKeyChecking=no' -i inventory.txt deploy-backend.yml -vvv
       - destroy-environment
 
   smoke-test:
@@ -317,7 +329,7 @@ jobs:
             else
               return 1
             fi
-      #- destroy-environment
+      - destroy-environment
       # Here's where you will add some code to rollback on failure
 
 workflows:
