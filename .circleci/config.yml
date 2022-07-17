@@ -190,8 +190,7 @@ jobs:
           name: Configure Infrastructure
           command: |
             ansible-playbook --ssh-common-args='-o StrictHostKeyChecking=no' -i .circleci/ansible/inventory.txt .circleci/ansible/configure-server.yml -vvv
-          environment:
-            ANSIBLE_HOST_KEY_CHECKING: False
+
       - destroy-environment
   run-migrations:
     docker:
