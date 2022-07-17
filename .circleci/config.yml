@@ -369,8 +369,8 @@ jobs:
       - run:
           name: Remove old frontend and backend
           command: |
-            OldWorkflowID = $(cat ~/OldWorkflowID.txt)
-            echo OldWorkflowID: "${OldWorkflowID}"
+            OldWorkflowID=$(cat ~/OldWorkflowID.txt)
+            echo "OldWorkflowID:" "${OldWorkflowID}"
 
             if [[ "${CIRCLE_WORKFLOW_ID:0:7}" =~ "${OldWorkflowID}" ]]
             then
