@@ -339,13 +339,22 @@ jobs:
       - checkout
       - run: yum install -y tar gzip
       - run:
+          name: Get Previous WorkflowID
+          command: |
+            export OldWorkflowID=$(aws cloudformation \
+            list-exports --query "Exports[?Name==\`PipelineID\`].Value" \
+            --no-paginate --output text )
+            echo $OldWorkflowID >> ~/OldWorkflowID.txt
+            cat ~/OldWorkflowID.txt
+
+      - run:
           name: Execute Cloudfront.yml
           command: |
             cd .circleci/files/
             aws cloudformation deploy \
             --template-file cloudfront.yml \
             --stack-name InitialStack \
-            --parameter-overrides WorkflowID="udapeople-${CIRCLE_WORKFLOW_ID:0:7}"
+            --parameter-overrides WorkflowID="udapeople-${CIRCLE_WORKFLOW_ID:0:7}" \ 
             --tags project=udapeople
       - revert-migrations
       - destroy-environment
