@@ -401,7 +401,6 @@ workflows:
           requires: [build-frontend]
       - scan-backend:
           requires: [build-backend]
-      - notify
       - deploy-infrastructure:
           requires:
             - scan-frontend
@@ -420,3 +419,5 @@ workflows:
           requires: [smoke-test]
       - cleanup:
           requires: [cloudfront-update]
+      - notify:
+          requires: [cleanup]
