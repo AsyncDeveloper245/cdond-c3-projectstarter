@@ -402,6 +402,7 @@ workflows:
           requires:
             - scan-frontend
             - scan-backend
+          #deploy only from master branch
           filters:
             branches:
               only: [master]
