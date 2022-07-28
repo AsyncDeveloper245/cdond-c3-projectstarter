@@ -23,7 +23,7 @@
         name: python3
         state: latest
 
-  # Get the environment variables from CircleCI and add to the EC2 instance
+  # Get the environment variables from CircleCI and add to the EC2 instance new changes
   environment:
     - TYPEORM_CONNECTION: "{{ lookup('env', 'TYPEORM_CONNECTION')}}"
     - TYPEORM_ENTITIES: "./src/modules/domain/**/*.entity.ts"
